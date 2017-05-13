@@ -7,8 +7,8 @@ global S
     S.GUI.WaterDispensed = 0;
 
     % Training phase
-    S.Names.TrainingPhase = {'CueA-Reward', 'CueB-Reward', 'CueA-Reward-CueB-Punish' , 'CueA-Punish-CueB-Reward', 'CueA-CueB-CueC'};
-    S.GUI.TrainingPhase = 5;
+    S.Names.TrainingPhase = {'CueA-Reward', 'CueB-Reward', 'CueA-Reward-CueB-Punish' , 'CueA-Punish-CueB-Reward', 'CueA-CueB-CueC','GoNoGo'};
+    S.GUI.TrainingPhase = 6;
     S.GUIMeta.TrainingPhase.Style = 'popupmenu';
     S.GUIMeta.TrainingPhase.String = S.Names.TrainingPhase;
  
@@ -22,7 +22,8 @@ global S
     S.GUI.RewardAmount = 4; %s
     S.GUI.NoiseDuration = 1; %s
     S.GUI.ITI_offset_mean_max = [2 3 5]; %s
-
+    S.GUI.ResponseTimeOut = 1; %s
+    
 %     S.GUI.CueProbabilities = 'Cue Probabilities [A B C]';
 %     S.GUIMeta.CueProbabilities.Style = 'text';
     S.GUI.pCues_ABC = [0.49 0.49 0.02]; % 3 cues - total must sum to 1

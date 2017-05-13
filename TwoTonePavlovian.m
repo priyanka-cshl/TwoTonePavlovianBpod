@@ -166,18 +166,13 @@ for currentTrial = 1:MaxTrials
     % compute ITI and delay durations
     ITIRange = str2num(S.GUI.ITI_offset_mean_max);
     CurrentITI = ITIRange(3)+1;
-%     while CurrentITI > (max(ITIRange) - min(ITIRange))
-%         CurrentITI = exprnd(ITIRange(2) - ITIRange(1));
-%     end
     while CurrentITI > ITIRange(3)
         CurrentITI = exprnd(ITIRange(2));
     end
     CurrentITI = CurrentITI + ITIRange(1);
+    
     DelayRange = str2num(S.GUI.Delay_offset_mean_max);
     CurrentDelay = DelayRange(3)+1;
-%     while CurrentDelay > (max(DelayRange) - min(DelayRange))
-%         CurrentDelay = exprnd(DelayRange(2) - DelayRange(1));
-%     end
     while CurrentDelay > DelayRange(3)
         CurrentDelay = exprnd(DelayRange(2));
     end
@@ -227,13 +222,24 @@ for currentTrial = 1:MaxTrials
         'OutputActions', Trigger2pAction); 
     end
     
+    % pavlovian?
+    if S.GUI.TrainingPhase == 6
+        PostDelayState = 'Response';
+    else
+        PostDelayState = Reinforcer;
+    end
+    
     sma = AddState(sma, 'Name', 'Cue', ...
         'Timer', S.GUI.CueDuration,...
         'StateChangeConditions', {'Tup', 'Delay'},...
         'OutputActions', CueAction); 
     sma = AddState(sma, 'Name', 'Delay', ...
         'Timer', CurrentDelay,...
-        'StateChangeConditions', {'Tup', Reinforcer},...
+        'StateChangeConditions', {'Tup', PostDelayState},...
+        'OutputActions', {});
+    sma = AddState(sma, 'Name', 'Response', ...
+        'Timer', S.GUI.ResponseTimeOut,...
+        'StateChangeConditions', {'Port4In', Reinforcer, 'Tup', 'exit'},...
         'OutputActions', {});
     sma = AddState(sma, 'Name', 'WhiteNoise', ...
         'Timer', S.GUI.NoiseDuration,...
