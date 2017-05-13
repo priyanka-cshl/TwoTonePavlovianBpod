@@ -49,16 +49,23 @@ global numplots
 global S
 
 %% Define parameters
-S = BpodSystem.ProtocolSettings; % Load settings chosen in launch manager into current workspace as a struct called S
-if isempty(fieldnames(S))  % If settings file was an empty struct, populate struct with default settings
+%S = BpodSystem.ProtocolSettings; % Load settings chosen in launch manager into current workspace as a struct called S
+
+% load settings from the previous session
+Allfiles = dir(fileparts(BpodSystem.DataPath));
+try
+    LastSession = load(fullfile(fileparts(BpodSystem.DataPath),Allfiles(end).name));
+    S = LastSession.SessionData.TrialSettings(end);
+catch % If settings file was an empty struct, populate struct with default settings
     TwoTonePavlovian_TaskParameters()
 end
+clear LastSession Allfiles
 
 % Initialize parameter GUI plugin
-BpodParameterGUI('init', S);
+PriyankaBpodParameterGUI('init', S);
 BpodSystem.Pause = 1;
 HandlePauseCondition;
-S = BpodParameterGUI('sync', S);
+S = PriyankaBpodParameterGUI('sync', S);
 
 %% Define trials
 MaxTrials = S.GUI.MaxTrials;
@@ -130,7 +137,7 @@ PavlovianTrialTypeOutcomePlot(BpodSystem.GUIHandles.SideOutcomePlot,'init',{Tria
 % LickRasterWindow = S.GUI.ITIDuration + S.GUI.CueDuration + ...
 %                     S.GUI.ReinforcerDelay + S.GUI.NoiseDuration;
 
-LickRasterWindow = [-2 4];
+LickRasterWindow = [-1 4];
 
 PavlovianLickRasterPlot(BpodSystem.GUIHandles, 'init');
 
@@ -151,7 +158,7 @@ BpodSystem.SoftCodeHandlerFunction = 'SoftCodeHandler_PlaySound';
 
 %% Main trial loop
 for currentTrial = 1:MaxTrials
-    S = BpodParameterGUI('sync', S); % Sync parameters with BpodParameterGUI plugin
+    S = PriyankaBpodParameterGUI('sync', S); % Sync parameters with PriyankaBpodParameterGUI plugin
     %R = GetValveTimes(S.GUI.RewardAmount, [1 3]); LeftValveTime = R(1); RightValveTime = R(2); % Update reward amounts
     
     ValveTime = GetValveTimes(S.GUI.RewardAmount, [4]);
@@ -221,7 +228,7 @@ for currentTrial = 1:MaxTrials
     end
     
     sma = AddState(sma, 'Name', 'Cue', ...
-        'Timer', 0,...
+        'Timer', S.GUI.CueDuration,...
         'StateChangeConditions', {'Tup', 'Delay'},...
         'OutputActions', CueAction); 
     sma = AddState(sma, 'Name', 'Delay', ...
